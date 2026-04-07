@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ControlPanel extends JPanel {
 
@@ -72,8 +74,14 @@ public class ControlPanel extends JPanel {
         addEdgeBtn.addActionListener(e -> {
             String from = fromField.getText();
             String to = toField.getText();
-            int weight = Integer.parseInt(weightField.getText());
+            int weight = 0;
 
+            try {
+                weight = Integer.parseInt(weightField.getText());
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Enter valid number!");
+                return;
+            }
             graphPanel.addEdge(from, to, weight);
 
             // clear fields
