@@ -1,10 +1,13 @@
+package Backend;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
-//Edges
+import Frontend.GraphPanel;
+import Frontend.Edge;
+
+// ===== EDGE CLASS =====
 class RouteConnection {
     int nodeA;
     int nodeB;
@@ -17,14 +20,15 @@ class RouteConnection {
     }
 }
 
-class SalesmanTourOptimizer {
+// ===== MAIN TSP CLASS =====
+public class TSP {
 
     private int lowestRouteCost;
     private int[] optimalSequence;
-    private final int[][] distanceGrid;
-    private final int totalVertices;
+    private int[][] distanceGrid;
+    private int totalVertices;
 
-    public SalesmanTourOptimizer(int vertices, List<RouteConnection> edgeList) {
+    public TSP(int vertices, List<RouteConnection> edgeList) {
         this.totalVertices = vertices;
         this.lowestRouteCost = Integer.MAX_VALUE;
         this.optimalSequence = new int[vertices + 1];
@@ -33,6 +37,7 @@ class SalesmanTourOptimizer {
         setupAdjacencyGrid(edgeList);
     }
 
+    // ===== BUILD MATRIX =====
     private void setupAdjacencyGrid(List<RouteConnection> edgeList) {
         for (int[] row : distanceGrid) {
             Arrays.fill(row, Integer.MAX_VALUE);
@@ -44,107 +49,100 @@ class SalesmanTourOptimizer {
         }
     }
 
+    // ===== MAIN EXECUTION =====
     public void executeAlgorithm() {
         boolean[] isVisited = new boolean[totalVertices];
         int[] activePath = new int[totalVertices + 1];
 
-        // Setup initial state
         isVisited[0] = true;
         activePath[0] = 0;
 
         findOptimalTour(0, 1, 0, isVisited, activePath);
-        displayFinalOutcome();
     }
 
-    private void findOptimalTour(int currentCity, int nodesCovered, int currentAccumulatedCost,
-            boolean[] isVisited, int[] activePath) {
+    // ===== CORE RECURSION (IMPORTANT FIX) =====
+    private void findOptimalTour(int currentCity, int count, int cost,
+            boolean[] visited, int[] path) {
 
-        // Base Condition Evaluation
-        if (nodesCovered == totalVertices) {
+        if (count == totalVertices) {
             if (distanceGrid[currentCity][0] != Integer.MAX_VALUE) {
-                int finalJourneyCost = currentAccumulatedCost + distanceGrid[currentCity][0];
 
-                if (finalJourneyCost < lowestRouteCost) {
-                    lowestRouteCost = finalJourneyCost;
+                int totalCost = cost + distanceGrid[currentCity][0];
 
-                    System.arraycopy(activePath, 0, optimalSequence, 0, activePath.length);
+                if (totalCost < lowestRouteCost) {
+                    lowestRouteCost = totalCost;
+
+                    System.arraycopy(path, 0, optimalSequence, 0, path.length);
                     optimalSequence[totalVertices] = 0;
                 }
             }
             return;
         }
 
-        // Search Phase
-        for (int targetCity = 0; targetCity < totalVertices; targetCity++) {
+        for (int i = 0; i < totalVertices; i++) {
 
-            // Skipping invalid/already visited cities
-            if (isVisited[targetCity])
+            if (visited[i])
                 continue;
-            if (distanceGrid[currentCity][targetCity] == Integer.MAX_VALUE)
+            if (distanceGrid[currentCity][i] == Integer.MAX_VALUE)
                 continue;
 
-            int projectedCost = currentAccumulatedCost + distanceGrid[currentCity][targetCity];
+            int newCost = cost + distanceGrid[currentCity][i];
 
-            // BOUNDING: Skip if this route is already more expensive than the best known
-            // route
-            if (projectedCost >= lowestRouteCost)
+            // pruning
+            if (newCost >= lowestRouteCost)
                 continue;
 
-            // Proceed with valid branch
-            isVisited[targetCity] = true;
-            activePath[nodesCovered] = targetCity;
+            visited[i] = true;
+            path[count] = i;
 
-            findOptimalTour(targetCity, nodesCovered + 1, projectedCost, isVisited, activePath);
+            findOptimalTour(i, count + 1, newCost, visited, path);
 
-            // Backtrack
-            isVisited[targetCity] = false;
+            visited[i] = false; // backtrack
         }
     }
 
-    private void displayFinalOutcome() {
-        if (lowestRouteCost != Integer.MAX_VALUE) {
-            System.out.println("\n*** TRAVELING SALESMAN RESULTS ***");
-            System.out.println("Least Cost Found: " + lowestRouteCost);
-            System.out.print("Best Route Followed: ");
+    // ===== RESULT RETURN =====
+    public String getResult(GraphPanel graphPanel) {
 
-            for (int idx = 0; idx <= totalVertices; idx++) {
-                System.out.print(optimalSequence[idx]);
-                if (idx < totalVertices) {
-                    System.out.print(" -> ");
+        StringBuilder result = new StringBuilder();
+
+        if (lowestRouteCost != Integer.MAX_VALUE) {
+
+            result.append("===== TSP RESULT =====\n\n");
+            result.append("Minimum Cost: ").append(lowestRouteCost).append("\n");
+            result.append("Path: ");
+
+            for (int i = 0; i <= totalVertices; i++) {
+                result.append(graphPanel.getNodeName(optimalSequence[i]));
+
+                if (i < totalVertices) {
+                    result.append(" -> ");
                 }
             }
-            System.out.println();
+
         } else {
-            System.out.println("No valid complete path could be found for the provided graph.");
+            result.append("No valid route found.");
         }
+
+        return result.toString();
     }
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+    // ===== CONNECT TO GUI =====
+    public static String runTSP(GraphPanel graphPanel) {
 
-        System.out.print("Enter total number of vertices (v): ");
-        int nodeCount = scanner.nextInt();
+        List<RouteConnection> edges = new ArrayList<>();
 
-        System.out.print("Enter total number of edges (e): ");
-        int edgeCount = scanner.nextInt();
+        for (Edge e : graphPanel.edges) {
+            int a = graphPanel.nodes.indexOf(e.n1);
+            int b = graphPanel.nodes.indexOf(e.n2);
 
-        List<RouteConnection> graphConnections = new ArrayList<>();
-
-        System.out.println("Enter each edge (Source Destination Weight):");
-
-        int inputCounter = 0;
-        while (inputCounter < edgeCount) {
-            int source = scanner.nextInt();
-            int dest = scanner.nextInt();
-            int cost = scanner.nextInt();
-            graphConnections.add(new RouteConnection(source, dest, cost));
-            inputCounter++;
+            edges.add(new RouteConnection(a, b, e.weight));
         }
 
-        // Create object
-        SalesmanTourOptimizer tspSolver = new SalesmanTourOptimizer(nodeCount, graphConnections);
-        tspSolver.executeAlgorithm();
+        TSP tsp = new TSP(graphPanel.nodes.size(), edges);
 
-        scanner.close();
+        tsp.executeAlgorithm();
+
+        return tsp.getResult(graphPanel);
     }
 }

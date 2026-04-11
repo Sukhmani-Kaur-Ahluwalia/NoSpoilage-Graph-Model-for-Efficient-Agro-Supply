@@ -1,3 +1,5 @@
+package Frontend;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -11,26 +13,42 @@ public class Dashboard extends JFrame {
         // ✅ FULL SCREEN
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        setLayout(new BorderLayout());
+        // ===== MAIN PANEL WITH NEON GRADIENT =====
+        JPanel backgroundPanel = UIUtils.createGradientPanel();
+        backgroundPanel.setLayout(new BorderLayout());
+        setContentPane(backgroundPanel);
 
         // ===== TOP TITLE =====
         JLabel title = new JLabel("Graph Configuration", JLabel.CENTER);
-        title.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        title.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        UIUtils.styleLabel(title, 24, true);
+        title.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
         add(title, BorderLayout.NORTH);
 
         // ===== MAIN COMPONENTS =====
         GraphPanel graphPanel = new GraphPanel();
+        graphPanel.setOpaque(false); // Make transparent for gradient
+        graphPanel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
+
         ControlPanel controlPanel = new ControlPanel(graphPanel);
+        controlPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.WHITE, 1),
+            BorderFactory.createEmptyBorder(10, 0, 10, 10)
+        ));
 
         // ===== SPLIT: GRAPH + ABOUT =====
+        JPanel aboutPanel = createAboutPanel();
+        aboutPanel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
+
         JSplitPane splitPane = new JSplitPane(
                 JSplitPane.HORIZONTAL_SPLIT,
                 graphPanel,
-                createAboutPanel());
+                aboutPanel);
 
-        splitPane.setDividerLocation(800);
-        splitPane.setResizeWeight(0.7);
+        splitPane.setDividerLocation(0.75); // Fixed proportion to prevent overlap
+        splitPane.setResizeWeight(0.8);
+        splitPane.setOpaque(false);
+        splitPane.setBorder(null);
+        splitPane.setDividerSize(2);
 
         // ===== ADD TO FRAME =====
         add(controlPanel, BorderLayout.WEST);
@@ -42,19 +60,26 @@ public class Dashboard extends JFrame {
     // ===== ABOUT PANEL =====
     private JPanel createAboutPanel() {
 
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                g.setColor(new Color(0, 0, 0, 80));
+                g.fillRect(0, 0, getWidth(), getHeight());
+                super.paintComponent(g);
+            }
+        };
         panel.setLayout(new BorderLayout());
-        panel.setPreferredSize(new Dimension(280, 0));
-        panel.setBackground(new Color(245, 245, 245));
+        panel.setPreferredSize(new Dimension(350, 0));
+        panel.setOpaque(false);
 
         // ✅ Border
         panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
         // ===== TITLE =====
         JLabel title = new JLabel("About Project");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        UIUtils.styleLabel(title, 18, true);
+        title.setForeground(UIUtils.NEON_PRIMARY);
         title.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        title.setForeground(new Color(34, 139, 34));
 
         // ===== CONTENT =====
         JTextArea content = new JTextArea();
@@ -62,7 +87,8 @@ public class Dashboard extends JFrame {
         content.setLineWrap(true);
         content.setWrapStyleWord(true);
         content.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-        content.setBackground(new Color(245, 245, 245));
+        content.setBackground(new Color(0, 0, 0, 0)); 
+        content.setForeground(Color.WHITE); // Make it white as requested
         content.setMargin(new Insets(10, 10, 10, 10));
         content.setCaretPosition(0); // start from top
 
@@ -82,6 +108,8 @@ public class Dashboard extends JFrame {
 
         JScrollPane scroll = new JScrollPane(content);
         scroll.setBorder(null);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
 
         panel.add(title, BorderLayout.NORTH);
         panel.add(scroll, BorderLayout.CENTER);

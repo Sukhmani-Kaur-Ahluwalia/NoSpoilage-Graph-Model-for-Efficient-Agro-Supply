@@ -3,10 +3,12 @@
 //edge e- a(src) b (dest) 
 //for cycle detect- union find // union(a,b) if same ps - same grp (dont include)
 //if diff - union(pA, pB)
+package Backend;
 
 import java.util.*;
+import Frontend.GraphPanel;
 
-class kruskals {
+public class Kruskal {
     static class Edge implements Comparable<Edge> {
         int src;
         int dest;
@@ -97,6 +99,45 @@ class kruskals {
             System.out.println(edge.src + " -- " + edge.dest + " == " + edge.wt);
         }
 
+    }
+
+    public static String runKruskal(GraphPanel graphPanel) {
+
+        ArrayList<Kruskal.Edge> graph = new ArrayList<>();
+        for (Frontend.Edge e : graphPanel.edges) {
+            int src = graphPanel.nodes.indexOf(e.n1);
+            int dest = graphPanel.nodes.indexOf(e.n2);
+
+            graph.add(new Kruskal.Edge(src, dest, e.weight));
+        }
+
+        Collections.sort(graph);
+
+        init(graphPanel.nodes.size());
+
+        int cost = 0;
+        StringBuilder result = new StringBuilder();
+
+        result.append("===== KRUSKAL MST =====\n\n");
+
+        for (Edge e : graph) {
+            int pA = find(e.src);
+            int pB = find(e.dest);
+
+            if (pA != pB) {
+                union(pA, pB);
+                cost += e.wt;
+
+                result.append(
+                        graphPanel.getNodeName(e.src) + " -- " +
+                                graphPanel.getNodeName(e.dest) +
+                                " = " + e.wt + "\n");
+            }
+        }
+
+        result.append("\nTotal Cost: " + cost);
+
+        return result.toString();
     }
 
     public static void main(String[] args) {

@@ -1,16 +1,9 @@
+package Backend;
+
 import java.util.*;
+import Frontend.GraphPanel;
 
-class DijkstraEdge {
-    int destination;
-    int time;
-
-    DijkstraEdge(int destination, int time) {
-        this.destination = destination;
-        this.time = time;
-    }
-}
-
-class Delivery {
+public class Delivery {
 
     public static String findpshort(List<List<DijkstraEdge>> graph, int source, int destination,
             GraphPanel graphPanel) {

@@ -1,6 +1,8 @@
+package Frontend;
+
 public class Node {
 
-    String name;
+    public String name;
     int x, y;
     String type; // ⭐ NEW
 

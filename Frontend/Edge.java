@@ -1,7 +1,9 @@
+package Frontend;
+
 public class Edge {
 
-    Node n1, n2;
-    int weight;
+    public Node n1, n2;
+    public int weight;
 
     public Edge(Node n1, Node n2, int weight) {
         this.n1 = n1;

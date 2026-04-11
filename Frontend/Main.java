@@ -1,3 +1,7 @@
+package Frontend;
+
+import Frontend.LoginPage;
+import Frontend.Dashboard;
 import javax.swing.*;
 
 public class Main {
@@ -6,8 +10,9 @@ public class Main {
         // Makes UI look modern (important)
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
-        new Dashboard();
+        new LoginPage();
     }
 }
