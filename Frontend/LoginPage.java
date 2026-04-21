@@ -2,6 +2,7 @@ package Frontend;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 public class LoginPage extends JFrame {
 
@@ -73,6 +74,12 @@ public class LoginPage extends JFrame {
         loginBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         UIUtils.styleButton(loginBtn);
 
+        JButton registerBtn = new JButton("NEW USER? REGISTER");
+        registerBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        UIUtils.styleButton(registerBtn);
+        registerBtn.setBackground(new Color(30, 30, 30));
+        registerBtn.setForeground(UIUtils.NEON_PRIMARY);
+
         // ===== ADD COMPONENTS (CLEAN ORDER) =====
         right.add(Box.createVerticalGlue());
 
@@ -90,13 +97,8 @@ public class LoginPage extends JFrame {
         right.add(Box.createRigidArea(new Dimension(0, 20)));
 
         right.add(loginBtn);
-
-        JLabel hint = new JLabel("(Hint: admin / 1234)");
-        UIUtils.styleLabel(hint, 10, false);
-        hint.setForeground(Color.GRAY);
-        hint.setAlignmentX(Component.CENTER_ALIGNMENT);
         right.add(Box.createRigidArea(new Dimension(0, 10)));
-        right.add(hint);
+        right.add(registerBtn);
 
         right.add(Box.createVerticalGlue());
 
@@ -105,7 +107,12 @@ public class LoginPage extends JFrame {
             String user = usernameField.getText().trim();
             String pass = new String(passwordField.getPassword()).trim();
 
-            if (user.equals("admin") && pass.equals("1234")) {
+            if (user.isEmpty() || pass.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter username and password.");
+                return;
+            }
+
+            if (UserStore.authenticate(user, pass)) {
                 new Dashboard();
                 dispose();
             } else {
@@ -114,10 +121,11 @@ public class LoginPage extends JFrame {
         };
 
         loginBtn.addActionListener(e -> loginTask.run());
-
-        // Allow Enter key to trigger login
         passwordField.addActionListener(e -> loginTask.run());
         usernameField.addActionListener(e -> loginTask.run());
+
+        // ===== REGISTER ACTION =====
+        registerBtn.addActionListener(e -> showRegisterDialog());
 
         // ===== ADD TO CARD =====
         card.add(left);
@@ -127,5 +135,65 @@ public class LoginPage extends JFrame {
 
         add(mainPanel);
         setVisible(true);
+    }
+
+    private void showRegisterDialog() {
+        JDialog dialog = new JDialog(this, "Register New User", true);
+        dialog.setSize(350, 250);
+        dialog.setLocationRelativeTo(this);
+        dialog.setLayout(new GridBagLayout());
+        dialog.getContentPane().setBackground(new Color(20, 20, 20));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 10, 8, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JLabel title = new JLabel("Create Account");
+        UIUtils.styleLabel(title, 16, true);
+        title.setForeground(UIUtils.NEON_PRIMARY);
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        dialog.add(title, gbc);
+
+        gbc.gridwidth = 1;
+        JLabel uLabel = new JLabel("Username:");
+        UIUtils.styleLabel(uLabel, 12, false);
+        gbc.gridx = 0; gbc.gridy = 1;
+        dialog.add(uLabel, gbc);
+
+        JTextField newUser = new JTextField(15);
+        gbc.gridx = 1; gbc.gridy = 1;
+        dialog.add(newUser, gbc);
+
+        JLabel pLabel = new JLabel("Password:");
+        UIUtils.styleLabel(pLabel, 12, false);
+        gbc.gridx = 0; gbc.gridy = 2;
+        dialog.add(pLabel, gbc);
+
+        JPasswordField newPass = new JPasswordField(15);
+        gbc.gridx = 1; gbc.gridy = 2;
+        dialog.add(newPass, gbc);
+
+        JButton submitBtn = new JButton("REGISTER");
+        UIUtils.styleButton(submitBtn);
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
+        dialog.add(submitBtn, gbc);
+
+        submitBtn.addActionListener(e -> {
+            String username = newUser.getText().trim();
+            String password = new String(newPass.getPassword()).trim();
+
+            if (username.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Username and password cannot be empty.");
+                return;
+            }
+            if (UserStore.register(username, password)) {
+                JOptionPane.showMessageDialog(dialog, "Account created successfully! ✅\nYou can now log in.");
+                dialog.dispose();
+            } else {
+                JOptionPane.showMessageDialog(dialog, "Username already exists. Choose another.");
+            }
+        });
+
+        dialog.setVisible(true);
     }
 }
