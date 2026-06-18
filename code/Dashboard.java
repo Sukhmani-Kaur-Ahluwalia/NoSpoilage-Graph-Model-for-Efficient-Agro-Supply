@@ -1,7 +1,5 @@
 package code;
-
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -10,7 +8,6 @@ class Dashboard extends JFrame implements ActionListener,ItemListener
 {
   public static final long serialVersionUID=1L;
   static final String SUPPLY_MST_FILE = "store_msts.txt";
-  
   JPanel left,right,contentRight;
   JSplitPane outer;
   backgroundPanel bp;
@@ -39,14 +36,12 @@ class Dashboard extends JFrame implements ActionListener,ItemListener
   ArrayList<String> supplierNotes = new ArrayList<String>();
   ArrayList<SupplierPath> supplierPaths = new ArrayList<SupplierPath>();
 
-  JTextArea resultArea;
-  
+  JTextArea resultArea; 
   drawNodes obj;
   drawEdge de;
   Kruskals kobj;
   Dijkstra dobj;
   RoundTour robj;
-  
   class SupplierPath
   {
       int storeIndex, farmIndex, pathWeight;
@@ -71,13 +66,11 @@ class Dashboard extends JFrame implements ActionListener,ItemListener
 	loggedInNode = loginNode;
 	getNodes();
 	getEdges();
-	
 	String n[];
 	left=new JPanel();
 	left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
 	left.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 	left.setOpaque(false);
-	
 	right = new JPanel(new BorderLayout());
 	right.setOpaque(false);
 	
