@@ -1,22 +1,17 @@
 package code;
-
 import java.util.*;
 import javax.swing.*;
 import java.awt.*;
-
 class Dijkstra extends JPanel
 {
 	public static final long serialVersionUID=1L;
-	
 	ArrayList <Graph> g=new ArrayList<Graph>();
 	ArrayList<Integer> path=new ArrayList<Integer>();
 	ArrayList<Integer> traffic=new ArrayList<Integer>();
-	
 	Dijkstra(ArrayList <Graph> g)
 	{
 	  this.g=g;
 	}
-	
 	int[] dijkstra(int n, int src, int parent[], ArrayList<Graph> g) 
 	{
 		int dist[] = new int[n];
@@ -31,18 +26,14 @@ class Dijkstra extends JPanel
 	    while (!pq.isEmpty()) 
 	    {
 	        Graph current = pq.poll();
-
 	        int u = current.s;
 	        int currentDist = current.w;
-
 	        if (currentDist > dist[u])
 	            continue;
-
 	        for (Graph edge : g) 
 	        {
 	            if (edge.s == u) 
-	            {
-	                int v = edge.d;
+	            {   int v = edge.d;
 	                int weight = edge.w;
 
 	                if (dist[u] + weight < dist[v]) 
@@ -52,7 +43,6 @@ class Dijkstra extends JPanel
 	                    pq.add(new Graph(v, v, dist[v]));
 	                }
 	            }
-	            
 	            if (edge.d == u)
 	            {
 	                int v = edge.s;
@@ -67,10 +57,8 @@ class Dijkstra extends JPanel
 	            }
 	        }
 	    }
-
 	    return dist;
 	}
-	
 	 //Finds and prints the shortest path between a specific source and destination
 	void findShortestPath(int n, int src, int dest) 
 	{
