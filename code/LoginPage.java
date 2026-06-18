@@ -1,5 +1,4 @@
 package code;
-
 import javax.swing.*;
 import java.io.*;
 import java.awt.*;
@@ -21,11 +20,9 @@ class LoginPage extends JFrame implements ActionListener
 	right=new JPanel();
 	right.setLayout(new BoxLayout(right,BoxLayout.Y_AXIS));
 	right.setOpaque(false);
-	
 	username=new JTextField(20);
 	//password=new JTextField(20);
 	password=new JPasswordField(20);
-	
 	l1=new JLabel("Welcome to NoSpoilage");
 	l1.setFont(new Font("Arial", Font.BOLD, 40));
 	l1.setForeground(Color.white);
@@ -87,7 +84,6 @@ class LoginPage extends JFrame implements ActionListener
 	right.add(newuser);
 	right.add(register);
 	right.add(Box.createVerticalGlue());
-	
 	backgroundPanel bp=new backgroundPanel();
 	bp.setLayout(new GridBagLayout());
 	
